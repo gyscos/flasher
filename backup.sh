@@ -5,6 +5,7 @@ DEVICE=/dev/$1
 
 echo "Doing a backup of $DEVICE."
 
+# TODO: Save on NFS? Send an email?
 TARGET=/var/lib/flasher/backups/
 
 FILENAME=$TARGET/$(date +%Y-%m-%d_%H:%M)
