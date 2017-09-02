@@ -1,0 +1,5 @@
+[Unit]
+Description=Run the flash util on a flash drive
+
+[Service]
+ExecStart=/usr/bin/flasher %I
