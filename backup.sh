@@ -14,6 +14,9 @@ FILENAME=$TARGET/$(date +%Y-%m-%d_%H:%M)
 PARTITION=${DEVICE}1
 if [ -b $PARTITION ]
 then
+	FS=$(eval $(blkid $DEV | awk ' { print $3 } '); echo $TYPE)
+	echo "Found filesystem $FS"
+
 	# Attempt 1: find a mountable partition, mount it and backup the content.
 	MOUNT=$(mktemp -d)
 	mount $PARTITION $MOUNT
