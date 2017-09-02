@@ -17,3 +17,5 @@ if [ -f $FORMAT_FILE ]
 then
 	$D/format.sh "$NAME" $(cat $FORMAT_FILE)
 fi
+
+echo "$NAME: Work done"

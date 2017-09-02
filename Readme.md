@@ -23,3 +23,8 @@ Flasher is intended to be run on a computer with the following hardware connecte
 * A on/off switch to enable automatic action
 * A button to move between modes (Backup, Format Fat32, Format NTFS, Format ext, ...)
 * A bunch of LEDs to indicate current status
+
+## How's it work?
+
+* A daemon listen for button presses, toggle LEDs, and maintain status files.
+* A udev rule waits for plugged flash drives, and starts a script (via a systemd service). This script reads the current state, and performs the corresponding actions.
