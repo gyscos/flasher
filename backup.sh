@@ -12,7 +12,7 @@ PARTITION=${DEVICE}1
 MOUNT=$(mktemp -d)
 mount $PARTITION $MOUNT
 
-FILENAME=$(date +%Y-%m-%d)
+FILENAME=$(date +%Y-%m-%d_%H:%M)
 tar -C $MOUNT -cf - . | zstd > $TARGET/$FILENAME.tar.zst
 ls -l $MOUNT/ >> /var/log/flasher.log
 
