@@ -3,8 +3,6 @@
 NAME=$1
 DEVICE=/dev/$1
 
-echo "Doing a backup of $DEVICE."
-
 # TODO: Save on NFS? Send an email?
 TARGET=/var/lib/flasher/backups/
 
@@ -28,7 +26,7 @@ then
 	rmdir $MOUNT
 else
 	# Attempt 2: just backup the block device.
-	echo Meh~
+	echo 'Meh~'
 	cat $DEVICE | zstd > $FILENAME.img.zst
 fi
 

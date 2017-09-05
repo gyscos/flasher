@@ -6,10 +6,6 @@ NAME=$1
 FS=$2
 DEVICE=/dev/$NAME
 
-# TODO: find this from current state
-
-echo Formatting ${DEVICE}1 as $FS
-
 CMD="mkfs.$FS"
 ARGS=""
 
