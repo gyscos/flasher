@@ -14,7 +14,7 @@ license=('MIT')
 install=flasher.install
 source=("90-flasher.rules"
 	"backup.sh"
-	"flasher@.service"
+	"flasher-trigger@.service"
 	"format.sh"
 	"install.sh"
 	"main.sh")
