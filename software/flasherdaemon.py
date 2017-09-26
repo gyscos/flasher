@@ -89,11 +89,21 @@ class FlasherDaemon:
         self.blinking = False
         self.blinking_thread = None
 
-        # Init starting modes
+    def cleanup(self):
+        "Performs cleanup actions on exit."
         self.all_off()
-        self.enter_mode(0)
-        self.set_active(self.gpio.read(TOGGLE_PIN))
-        self.set_state(State.WAITING)
+        try:
+            os.remove(PIPE_FILE)
+        except FileNotFoundError:
+            pass
+        try:
+            os.remove(BACKUP_FILE)
+        except FileNotFoundError:
+            pass
+        try:
+            os.remove(FORMAT_FILE)
+        except FileNotFoundError:
+            pass
 
     def all_off(self):
         "Turn everything off."
@@ -104,14 +114,23 @@ class FlasherDaemon:
 
     def run(self):
         "Run the main loop: listen for events"
-        self.gpio.set_pull_up_down(BUTTON_PIN, pigpio.PUD_UP)
-        self.gpio.set_pull_up_down(TOGGLE_PIN, pigpio.PUD_UP)
+        try:
+            # Init starting modes
+            self.all_off()
+            self.enter_mode(0)
+            self.set_active(self.gpio.read(TOGGLE_PIN))
+            self.set_state(State.WAITING)
 
-        self.gpio.callback(BUTTON_PIN, pigpio.EITHER_EDGE,
-                           self.on_button_press)
-        self.gpio.callback(TOGGLE_PIN, pigpio.EITHER_EDGE, self.on_toggle)
-        self.wait_for_input(self.on_input)
-        self.all_off()
+            self.gpio.set_pull_up_down(BUTTON_PIN, pigpio.PUD_UP)
+            self.gpio.set_pull_up_down(TOGGLE_PIN, pigpio.PUD_UP)
+
+            self.gpio.callback(BUTTON_PIN, pigpio.EITHER_EDGE,
+                               self.on_button_press)
+            self.gpio.callback(TOGGLE_PIN, pigpio.EITHER_EDGE, self.on_toggle)
+            self.wait_for_input(self.on_input)
+        finally:
+            print("Cleaning up before exiting.")
+            self.cleanup()
 
     @staticmethod
     def wait_for_input(on_input):
@@ -213,6 +232,8 @@ class FlasherDaemon:
             self.blinking = False
             self.blinking_thread.join()
 
+        self.blinking = True
+
         def _blink():
             led_on = 1
             while self.blinking:
@@ -228,6 +249,7 @@ class FlasherDaemon:
 
     def enter_mode(self, mode: int):
         'Enters the given mode'
+        print('Entering mode', MODE_NAMES[mode])
         self.current_mode = mode
         if self.active:
             mode_name = MODE_NAMES[mode]
@@ -252,6 +274,7 @@ class FlasherDaemon:
         'Updates the status LED to match the given state.'
 
         print("Changed state: ", state)
+        self.state = state
 
         if state == State.WAITING:
             if self.active:

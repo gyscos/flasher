@@ -1,11 +1,12 @@
 [Unit]
 Description=Flasher daemon (formats flash drive when plugged)
+Wants=pigpio.service
+After=pigpio.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /usr/lib/flasher/flasherdaemon.py
+ExecStart=/usr/bin/python3 -u /usr/lib/flasher/flasherdaemon.py
+KillSignal=SIGINT
 
 [Install]
 WantedBy=multi-user.target
-Wants=pigpio.service
-After=pigpio.service
