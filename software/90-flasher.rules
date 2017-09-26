@@ -1,2 +1,1 @@
-SUBSYSTEM=="block", ATTR{removable}=="[0-9]", RUN+="/usr/bin/systemctl restart flasher-trigger@%k"
-
+SUBSYSTEM=="block", ENV{ID_BUS}=="usb", RUN+="/usr/bin/systemctl restart flasher-trigger@%k"

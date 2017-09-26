@@ -36,6 +36,7 @@ then
     echo "DONE" > $STATUS_FILE
 else
     # Disk was just removed
+    echo "Disk was just removed"
     echo "GONE" > $STATUS_FILE
 fi
 
