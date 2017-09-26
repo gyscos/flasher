@@ -7,8 +7,9 @@ STATE_DIR=/var/lib/flasher/state
 # Backup and Format files are written to by the GPIO service.
 BACKUP_FILE=$STATE_DIR/backup
 FORMAT_FILE=$STATE_DIR/format
+
 # Status file is read by the GPIO service (might even be a socket?)
-STATUS_FILE=$STATE_DIR/status
+STATUS_FILE=/var/run/flasher/status
 
 D=/usr/lib/flasher
 #D=.
