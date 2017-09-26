@@ -27,5 +27,5 @@ sha256sums=("SKIP"
 
 
 package() {
-	PREFIX=$pkgdir ./install.sh
+	DESTDIR=$pkgdir ./install.sh
 }
