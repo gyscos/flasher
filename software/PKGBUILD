@@ -5,27 +5,31 @@ pkgrel=1
 pkgdesc="Flasher util to format or backup flash drive"
 depends=("parted" "systemd" "zstd" "python" "python-pigpio-git")
 optdepends=("exfat-utils: exfat support"
-	    "dosfstools: vfat support"
-	    "btrfs-progs: btrfs support"
-	    "ntfs-3g: ntfs support"
-	    "hfsprogs: hfs support")
+        "dosfstools: vfat support"
+        "btrfs-progs: btrfs support"
+        "ntfs-3g: ntfs support"
+        "hfsprogs: hfs support")
 arch=('any')
 license=('MIT')
 install=flasher.install
 source=("90-flasher.rules"
-	"backup.sh"
-	"flasher-trigger@.service"
-	"format.sh"
-	"install.sh"
-	"main.sh")
+    "backup.sh"
+    "flasher-trigger@.service"
+    "flasher.service"
+    "flasherdaemon.py"
+    "format.sh"
+    "install.sh"
+    "main.sh")
 sha256sums=("SKIP"
-	    "SKIP"
-	    "SKIP"
-	    "SKIP"
-	    "SKIP"
-	    "SKIP")
+        "SKIP"
+        "SKIP"
+        "SKIP"
+        "SKIP"
+        "SKIP"
+        "SKIP"
+        "SKIP")
 
 
 package() {
-	DESTDIR=$pkgdir ./install.sh
+    DESTDIR=$pkgdir ./install.sh
 }

@@ -11,27 +11,28 @@ from enum import Enum
 import pigpio
 
 
-# PIPE_DIR = "/var/run/flasher"
-PIPE_DIR = "./flasher"
+PIPE_DIR = "/var/run/flasher"
+# PIPE_DIR = "./flasher"
 PIPE_FILE = PIPE_DIR + "/status"
 
 STATE_DIR = "/var/lib/flasher/state"
+# STATE_DIR = "./state"
 BACKUP_FILE = STATE_DIR + "/backup"
 FORMAT_FILE = STATE_DIR + "/format"
 
 MODE_NAMES = ["ext4", "fat32", "ntfs", "backup"]
 
-MIN_BUTTON_DELAY = 5/1000
+MIN_BUTTON_DELAY = 100/1000
 
 # Pins numbers
 MODE_LED_PINS = [14, 15, 2, 3]
 
+STATUS_LED_G_PIN = 17
 STATUS_LED_R_PIN = 27
-STATUS_LED_G_PIN = 22
 
 # Those are input
-BUTTON_PIN = 24
-TOGGLE_PIN = 10
+BUTTON_PIN = 10
+TOGGLE_PIN = 9
 
 BLINKING_TIMES = {
     0: 0.1,
@@ -89,15 +90,28 @@ class FlasherDaemon:
         self.blinking_thread = None
 
         # Init starting modes
+        self.all_off()
         self.enter_mode(0)
         self.set_active(self.gpio.read(TOGGLE_PIN))
+        self.set_state(State.WAITING)
+
+    def all_off(self):
+        "Turn everything off."
+        for pin in MODE_LED_PINS:
+            self.gpio.write(pin, 0)
+        self.gpio.write(STATUS_LED_G_PIN, 0)
+        self.gpio.write(STATUS_LED_R_PIN, 0)
 
     def run(self):
         "Run the main loop: listen for events"
-        self.gpio.callback(BUTTON_PIN, pigpio.FALLING_EDGE,
+        self.gpio.set_pull_up_down(BUTTON_PIN, pigpio.PUD_UP)
+        self.gpio.set_pull_up_down(TOGGLE_PIN, pigpio.PUD_UP)
+
+        self.gpio.callback(BUTTON_PIN, pigpio.EITHER_EDGE,
                            self.on_button_press)
         self.gpio.callback(TOGGLE_PIN, pigpio.EITHER_EDGE, self.on_toggle)
         self.wait_for_input(self.on_input)
+        self.all_off()
 
     @staticmethod
     def wait_for_input(on_input):
@@ -112,6 +126,8 @@ class FlasherDaemon:
                 with open(PIPE_FILE) as file:
                     for line in file:
                         on_input(line.strip())
+        except:
+            pass
         finally:
             os.remove(PIPE_FILE)
 
@@ -126,10 +142,13 @@ class FlasherDaemon:
         self.last_event = now
         return False
 
-    def on_button_press(self, _gpio, _level, _tick):
+    def on_button_press(self, _gpio, level, _tick):
         "Change the selected mode when the button is pressed."
 
         if self._debounce():
+            return
+
+        if level == 1:
             return
 
         if not self.active:
@@ -231,13 +250,16 @@ class FlasherDaemon:
 
     def set_state(self, state: State):
         'Updates the status LED to match the given state.'
+
+        print("Changed state: ", state)
+
         if state == State.WAITING:
             if self.active:
-                self.set_status_led(StatusColor.RED)
+                self.set_status_led(StatusColor.GREEN)
             else:
                 self.set_status_led(StatusColor.NONE)
         elif state == State.FORMATTING:
-            self.set_status_led(StatusColor.GREEN)
+            self.set_status_led(StatusColor.RED)
         elif state == State.BACKING:
             self.blink_status_led(StatusColor.RED)
         elif state == State.READY:
@@ -250,7 +272,10 @@ def write_format(filesystem):
         with open(FORMAT_FILE, 'w') as file:
             file.write(filesystem)
     else:
-        os.remove(FORMAT_FILE)
+        try:
+            os.remove(FORMAT_FILE)
+        except:
+            pass
 
 
 def write_backup(enabled):
@@ -258,9 +283,12 @@ def write_backup(enabled):
     if enabled:
         # Make sure the file exists
         with open(BACKUP_FILE, 'a') as file:
-            file.write()
+            file.write('')
     else:
-        os.remove(BACKUP_FILE)
+        try:
+            os.remove(BACKUP_FILE)
+        except:
+            pass
 
 
 if __name__ == '__main__':
