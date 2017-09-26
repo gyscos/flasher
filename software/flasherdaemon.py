@@ -78,7 +78,7 @@ class FlasherDaemon:
 
     def __init__(self):
         # Establish connection to GPIO server
-        self.gpio = pigpio.pi('flash.local')
+        self.gpio = pigpio.pi()
 
         # Declare variables
         self.current_mode = 0
