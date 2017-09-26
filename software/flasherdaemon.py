@@ -172,6 +172,10 @@ class FlasherDaemon:
             # We're not doing anything in inactive mode.
             return
 
+        if self.state != State.WAITING:
+            # We're also not doing anything when a flash drive is plugged in.
+            return
+
         self.leave_mode()
         self.enter_mode((self.current_mode + 1) % len(MODE_NAMES))
 
