@@ -2,5 +2,5 @@
 Description=Run the flash util on a flash drive
 
 [Service]
-Type=onehsot
+Type=oneshot
 ExecStart=/usr/bin/flasher %I
