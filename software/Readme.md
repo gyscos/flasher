@@ -7,4 +7,11 @@ It includes:
 * A python daemon (`flasherdaemon.py`) that serves as an interface between the trigger script and the GPIO LEDs and buttons (currently only work on raspberry pi).
 * A systemd service file (`flasher.service`) that runs the python daemon.
 
-You can package everything in a `pkg` directory by running `DESTDIR=pkg/ ./install.sh`. There is also a `PKGBUILD` and a `flasher.install` to build an Archlinux package.
+You can package everything in a `pkg` directory by running `DESTDIR=pkg/ ./install.sh`.
+
+There is also a `PKGBUILD` and a `flasher.install`: on Archlinux, you can just run:
+
+```
+makepkg -si
+sudo systemctl start flasher
+```
