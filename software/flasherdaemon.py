@@ -138,17 +138,15 @@ class FlasherDaemon:
         if not os.path.exists(PIPE_DIR):
             os.makedirs(PIPE_DIR)
 
+        if os.path.exists(PIPE_FILE):
+            os.remove(PIPE_FILE)
+
         os.mkfifo(PIPE_FILE)
 
-        try:
-            while True:
-                with open(PIPE_FILE) as file:
-                    for line in file:
-                        on_input(line.strip())
-        except:
-            pass
-        finally:
-            os.remove(PIPE_FILE)
+        while True:
+            with open(PIPE_FILE) as file:
+                for line in file:
+                    on_input(line.strip())
 
     def _debounce(self):
         """Performs a manual debouncing of input.
