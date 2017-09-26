@@ -1,2 +1,2 @@
-ACTION=="add", SUBSYSTEM=="block", ATTR{removable}=="[0-9]", RUN+="/usr/bin/systemctl restart flasher-trigger@%k"
+SUBSYSTEM=="block", ATTR{removable}=="[0-9]", RUN+="/usr/bin/systemctl restart flasher-trigger@%k"
 

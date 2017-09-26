@@ -1,7 +1,7 @@
 #!/bin/sh
 
 NAME=$1
-DEVICE=/dev/$1
+DEVICE=/dev/$NAME
 
 # TODO: Save on NFS? Send an email?
 TARGET=/var/lib/flasher/backups/
