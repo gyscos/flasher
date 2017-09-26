@@ -2,10 +2,10 @@
 """This daemon manages the GPIO part of the flasher service.
 Currently expects to be run on a raspberry pi device."""
 
-# TODO: add CLI arguments? Read a config file?
-
-import time
+import configparser
 import os
+import sys
+import time
 from threading import Thread
 from enum import Enum
 import pigpio
@@ -14,6 +14,8 @@ import pigpio
 PIPE_DIR = "/var/run/flasher"
 # PIPE_DIR = "./flasher"
 PIPE_FILE = PIPE_DIR + "/status"
+
+CONFIG_FILE = "/etc/flasher.conf"
 
 STATE_DIR = "/var/lib/flasher/state"
 # STATE_DIR = "./state"
@@ -43,6 +45,30 @@ BLINKING_TIMES = {
 def main():
     "Main entry-point"
     FlasherDaemon().run()
+
+
+class Configuration:
+    "Store the main configuration for the daemon."
+
+    def __init__(self, conf):
+        self.mode_names = conf['mode_names'].split(',')
+        self.mode_led_pins = conf['mode_led_pins'].split(',')
+        self.status_led_g_pin = conf['status_led_g_pin']
+        self.status_led_r_pin = conf['status_led_r_pin']
+        self.button_pin = conf['button_pin']
+        self.toggle_pin = conf['toggle_pin']
+
+    @staticmethod
+    def load(filename):
+        "Loads the given config file."
+        config = configparser.ConfigParser()
+        try:
+            with open(filename) as file:
+                config.read_file(file)
+            return Configuration(config['Flasher'])
+        except FileNotFoundError:
+            print("Config file not found:", filename)
+            sys.exit(1)
 
 
 class State(Enum):
@@ -78,9 +104,6 @@ class FlasherDaemon:
     "Stores data for the daemon"
 
     def __init__(self):
-        # Establish connection to GPIO server
-        self.gpio = pigpio.pi()
-
         # Declare variables
         self.current_mode = 0
         self.state = State.WAITING
@@ -88,6 +111,10 @@ class FlasherDaemon:
         self.last_event = 0
         self.blinking = False
         self.blinking_thread = None
+        self.configuration = Configuration.load(CONFIG_FILE)
+
+        # Establish connection to GPIO server
+        self.gpio = pigpio.pi()
 
     def cleanup(self):
         "Performs cleanup actions on exit."

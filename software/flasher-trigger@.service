@@ -3,4 +3,4 @@ Description=Run the flash util on a flash drive
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/flasher %I
+ExecStart=/usr/lib/flasher/main.sh %I
